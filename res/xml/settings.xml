@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:summary="Application Settings"
+    android:title="Settings" >
+
+    <PreferenceCategory android:title="@string/preference_cat_about" >
+        <Preference
+            android:key="@string/preference_about_rate_us_key"
+            android:summary="@string/preference_about_rate_us_summary"
+            android:title="@string/preference_about_rate_us_title" >
+        </Preference>
+        <Preference
+            android:key="@string/preference_about_more_apps_key"
+            android:summary="@string/preference_about_more_apps_summary"
+            android:title="@string/preference_about_more_apps_title" >
+        </Preference>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/preference_cat_github" >
+        <Preference
+            android:key="@string/preference_rajawali_learn_key"
+            android:summary="@string/preference_rajawali_learn_summary"
+            android:title="@string/preference_rajawali_learn_title" />
+        <Preference
+            android:key="@string/preference_github_fork_key"
+            android:summary="@string/preference_github_fork_summary"
+            android:title="@string/preference_github_fork_title" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

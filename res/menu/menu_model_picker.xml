@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_settings"
+        android:showAsAction="never"
+        android:title="@string/menu_settings">
+    </item>
+    <item
+        android:id="@+id/menu_exit"
+        android:showAsAction="never"
+        android:title="@string/menu_exit">
+    </item>
+    <item
+        android:id="@+id/menu_up"
+        android:showAsAction="always"
+        android:title="@string/menu_up">
+    </item>
+    <!--
+    <item
+        android:id="@+id/menu_root"
+        android:showAsAction="always"
+        android:title="@string/menu_root">
+    </item>
+    -->
+    <item
+        android:id="@+id/menu_sdcard"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_sdcard">
+    </item>
+
+</menu>
