@@ -287,6 +287,8 @@ public class ModelPicker extends ListActivity {
 						}
 					});
 			break;
+		default:
+			break;
 		}
 		dialogMessage = builder.create();
 		dialogMessage.show();
