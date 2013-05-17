@@ -17,13 +17,21 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.ToxicBakery.apps.rajawaliserializer.SerializerRenderer.ParserCallback;
+import com.ToxicBakery.apps.rajawaliserializer.utils.Logger;
 
 public class Serializer extends Activity implements Runnable,
 		UncaughtExceptionHandler, OnClickListener, ParserCallback {
 
 	// MD5 and MAX are not yet supported
 	enum ParseTypes {
-		FBX, MD2, OBJ, STL;
+		THREEDS, FBX, MD2, OBJ, STL;
+
+		public static String correctExtension(final String input) {
+			if (input.indexOf("3") == 0)
+				return input.replace("3", "THREE");
+
+			return input;
+		}
 	}
 
 	public static final String INTENT_LOCATION = "INTENT_LOCATION";
@@ -123,6 +131,8 @@ public class Serializer extends Activity implements Runnable,
 
 	@Override
 	public void uncaughtException(Thread thread, Throwable ex) {
+		Logger.e(ex.getMessage());
+		ex.printStackTrace();
 		Message msg = new Message();
 		msg.obj = mInstance;
 		msg.arg1 = PARSING_FAILED;
@@ -133,16 +143,16 @@ public class Serializer extends Activity implements Runnable,
 	public void run() {
 		new SerializerRenderer(this, fileName, this);
 	}
-	
+
 	@Override
 	public void onParseFinished(BaseObject3D baseObject3D) {
 		try {
 			final String outFileName = (fileName + ".ser")
-					.substring(Environment
-							.getExternalStorageDirectory()
+					.substring(Environment.getExternalStorageDirectory()
 							.getAbsolutePath().length());
 			final MeshExporter exporter = new MeshExporter(baseObject3D);
-			exporter.setExportDirectory(Environment.getExternalStorageDirectory());
+			exporter.setExportDirectory(Environment
+					.getExternalStorageDirectory());
 			exporter.export(outFileName, ExportType.SERIALIZED);
 
 			Message msg = new Message();

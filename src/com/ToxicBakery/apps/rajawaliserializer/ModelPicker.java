@@ -209,10 +209,11 @@ public class ModelPicker extends ListActivity {
 				// Determine the extension of the file
 				String extension = selectedFile.getName();
 				try {
+					// TODO Clean up this mess, duplicate of what is in SerializerRenderer..
 					extension = extension.substring(
 							extension.lastIndexOf(".") + 1).toUpperCase(
 							Locale.getDefault());
-					ParseTypes.valueOf(extension);
+					ParseTypes.valueOf(ParseTypes.correctExtension(extension));
 				} catch (Exception e) {
 					e.printStackTrace();
 					displayMessage(R.string.error_not_parsable_title,
