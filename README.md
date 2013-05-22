@@ -10,12 +10,12 @@ Tool to quickly serialize models on your sdcard for use with Rajawali 3D engine 
 * OBJ  
    * Only OBJ models by themselve. OBJ + MTL support coming soon.  
 * STL  
+* MAX  
 
 ##Future
 Full Rajawali model support soon.  
 
 * MD5
-* MAX
   
 ##Play Store:  
 Get Rajawali Serializer from the [Google Play Store](https://play.google.com/store/apps/details?id=com.ToxicBakery.apps.rajawaliserializer)
