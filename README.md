@@ -5,6 +5,9 @@ Tool to quickly serialize models on your sdcard for use with Rajawali 3D engine 
   
 ##Model Support
 
+* AWD  
+   * Geometry only
+   * Single mesh models only, no children. Full support in the works.
 * FBX  
 * MD2  
 * OBJ  
