@@ -1,0 +1,8 @@
+<resources>
+
+    <string-array name="output_choices">
+        <item>AWD</item>
+        <item>Serialize</item>
+    </string-array>
+
+</resources>

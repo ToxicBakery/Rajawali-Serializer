@@ -5,12 +5,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import rajawali.util.MeshExporter.ExportType;
+
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
@@ -19,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.ToxicBakery.apps.rajawaliserializer.Serializer.ParseTypes;
@@ -156,8 +160,12 @@ public class ModelPicker extends ListActivity {
 		// If a dialog was previously displayed, reopen it.
 		if (dialogMessageData != null
 				&& dialogMessageData[2] == STATE_DIALOG_OPEN) {
-			displayMessage(dialogMessageData[0], dialogMessageData[1],
-					DialogType.valueOf(dialogMessageData[3]));
+			if (DialogType.valueOf(dialogMessageData[3]) != DialogType.SERIALIZE) {
+				displayMessage(dialogMessageData[0], dialogMessageData[1],
+						DialogType.valueOf(dialogMessageData[3]));
+			} else {
+				displaySerializeMessage();
+			}
 			dialogMessageData[2] = STATE_DIALOG_CLOSED;
 		}
 	}
@@ -222,9 +230,7 @@ public class ModelPicker extends ListActivity {
 					return;
 				}
 				if (selectedFile.canRead() && selectedFile.canWrite()) {
-					displayMessage(R.string.serialize_dialog_title,
-							R.string.serialize_dialog_message,
-							DialogType.SERIALIZE);
+					displaySerializeMessage();
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -232,6 +238,40 @@ public class ModelPicker extends ListActivity {
 						R.string.error_not_parsable_message, DialogType.WARNING);
 			}
 		}
+	}
+
+	private void displaySerializeMessage() {
+		final String title = getResources().getString(
+				R.string.serialize_dialog_title);
+
+		dialogMessageData = new String[] { title, "", "",
+				DialogType.SERIALIZE.toString() };
+
+		final ArrayAdapter<String> adapter = new ArrayAdapter<String>(context,
+				android.R.layout.simple_list_item_1, getResources()
+						.getStringArray(R.array.output_choices));
+
+		final OnClickListener clickListener = new OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which) {
+				case 0:// AWD
+					intentSerializer.putExtra(Serializer.INTENT_TYPE, ExportType.AWD);
+					break;
+				case 1:// Serialize
+					intentSerializer.putExtra(Serializer.INTENT_TYPE, ExportType.SERIALIZED);
+					break;
+				}
+				startActivity(intentSerializer);
+			}
+		};
+
+		final Builder builder = new AlertDialog.Builder(context);
+		builder.setTitle(title);
+		builder.setAdapter(adapter, clickListener);
+
+		dialogMessage = builder.create();
+		dialogMessage.show();
 	}
 
 	/**
@@ -268,17 +308,14 @@ public class ModelPicker extends ListActivity {
 						case EXIT:
 							finish();
 							break;
-						case SERIALIZE:
-							startActivity(intentSerializer);
-							break;
 						case WARNING:
+						default:
 							break;
 						}
 					}
 				});
 		switch (type) {
 		case EXIT:
-		case SERIALIZE:
 			builder.setNegativeButton(android.R.string.cancel,
 					new Dialog.OnClickListener() {
 						@Override

@@ -3,6 +3,7 @@ package com.ToxicBakery.apps.rajawaliserializer;
 import java.lang.Thread.UncaughtExceptionHandler;
 
 import rajawali.BaseObject3D;
+import rajawali.parser.AParser.ParsingException;
 import rajawali.util.MeshExporter;
 import rajawali.util.MeshExporter.ExportType;
 import android.app.Activity;
@@ -24,7 +25,7 @@ public class Serializer extends Activity implements Runnable,
 
 	// MD5 and MAX are not yet supported
 	enum ParseTypes {
-		THREEDS, FBX, MD2, OBJ, STL;
+		THREEDS, FBX, MD2, OBJ, STL, AWD;
 
 		public static String correctExtension(final String input) {
 			if (input.indexOf("3") == 0)
@@ -35,6 +36,7 @@ public class Serializer extends Activity implements Runnable,
 	}
 
 	public static final String INTENT_LOCATION = "INTENT_LOCATION";
+	public static final String INTENT_TYPE = "INTENT_TYPE";
 
 	private static final String BUNDLE_STARTED_PARSING = "STARTED_PARSING";
 	private static final String BUNDLE_FINISHED_PARSING = "FINISHED_PARSING";
@@ -50,6 +52,7 @@ public class Serializer extends Activity implements Runnable,
 	private Thread mThread;
 	private ProgressDialog mProgressDialog;
 	private Serializer mInstance;
+	private ExportType exportType;
 
 	private static final Handler mHandler = new Handler() {
 		public void handleMessage(Message msg) {
@@ -81,7 +84,13 @@ public class Serializer extends Activity implements Runnable,
 		// Fetch the file name from the extras
 		fileName = getIntent().getStringExtra(INTENT_LOCATION);
 		if (fileName == null)
+			// Todo need to warn the user what just happened
 			finish();
+
+		// Determine the export type
+		exportType = (ExportType) getIntent().getSerializableExtra(INTENT_TYPE);
+
+		Logger.i("Ready to export " + fileName + " to " + exportType);
 
 		mThread = new Thread(this);
 		mThread.setUncaughtExceptionHandler(this);
@@ -141,31 +150,46 @@ public class Serializer extends Activity implements Runnable,
 
 	@Override
 	public void run() {
-		new SerializerRenderer(this, fileName, this);
+		try {
+			new SerializerRenderer(this, fileName, this);
+		} catch (ParsingException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Parsing failed.");
+		}
 	}
 
 	@Override
 	public void onParseFinished(BaseObject3D baseObject3D) {
+		final Message msg = new Message();
+		msg.obj = mInstance;
+
 		try {
-			final String outFileName = (fileName + ".ser")
+			String extension = ".ser";
+			switch (exportType) {
+			case AWD:
+				extension = ".awd";
+				break;
+			case SERIALIZED:
+				break;
+			default:
+				extension = ".unknown";
+			}
+
+			final String outFileName = new String(fileName + extension)
 					.substring(Environment.getExternalStorageDirectory()
 							.getAbsolutePath().length());
 			final MeshExporter exporter = new MeshExporter(baseObject3D);
 			exporter.setExportDirectory(Environment
 					.getExternalStorageDirectory());
-			exporter.export(outFileName, ExportType.SERIALIZED);
+			exporter.export(outFileName, exportType);
 
-			Message msg = new Message();
-			msg.obj = mInstance;
 			msg.arg1 = PARSING_SUCCSESSFUL;
-			mHandler.sendMessage(msg);
 		} catch (Exception e) {
 			e.printStackTrace();
-			Message msg = new Message();
-			msg.obj = mInstance;
 			msg.arg1 = PARSING_FAILED;
-			mHandler.sendMessage(msg);
 		}
+
+		mHandler.sendMessage(msg);
 	}
 
 	private void setParsingStatusEnded(int msgRes) {
