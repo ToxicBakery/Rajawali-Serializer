@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import rajawali.util.MeshExporter.ExportType;
-
+import rajawali.util.exporter.AwdExporter;
+import rajawali.util.exporter.SerializationExporter;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
@@ -256,10 +256,12 @@ public class ModelPicker extends ListActivity {
 			public void onClick(DialogInterface dialog, int which) {
 				switch (which) {
 				case 0:// AWD
-					intentSerializer.putExtra(Serializer.INTENT_TYPE, ExportType.AWD);
+					intentSerializer.putExtra(Serializer.INTENT_TYPE,
+							AwdExporter.class);
 					break;
 				case 1:// Serialize
-					intentSerializer.putExtra(Serializer.INTENT_TYPE, ExportType.SERIALIZED);
+					intentSerializer.putExtra(Serializer.INTENT_TYPE,
+							SerializationExporter.class);
 					break;
 				}
 				startActivity(intentSerializer);

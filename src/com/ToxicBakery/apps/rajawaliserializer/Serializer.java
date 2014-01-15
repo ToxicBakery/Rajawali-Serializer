@@ -2,10 +2,10 @@ package com.ToxicBakery.apps.rajawaliserializer;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 
-import rajawali.BaseObject3D;
-import rajawali.parser.AParser.ParsingException;
+import rajawali.Object3D;
+import rajawali.parser.ParsingException;
 import rajawali.util.MeshExporter;
-import rajawali.util.MeshExporter.ExportType;
+import rajawali.util.exporter.AExporter;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -52,7 +52,7 @@ public class Serializer extends Activity implements Runnable,
 	private Thread mThread;
 	private ProgressDialog mProgressDialog;
 	private Serializer mInstance;
-	private ExportType exportType;
+	private Class<AExporter> exportType;
 
 	private static final Handler mHandler = new Handler() {
 		public void handleMessage(Message msg) {
@@ -62,6 +62,7 @@ public class Serializer extends Activity implements Runnable,
 		};
 	};
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -88,7 +89,8 @@ public class Serializer extends Activity implements Runnable,
 			finish();
 
 		// Determine the export type
-		exportType = (ExportType) getIntent().getSerializableExtra(INTENT_TYPE);
+		exportType = (Class<AExporter>) getIntent().getSerializableExtra(
+				INTENT_TYPE);
 
 		Logger.i("Ready to export " + fileName + " to " + exportType);
 
@@ -159,29 +161,17 @@ public class Serializer extends Activity implements Runnable,
 	}
 
 	@Override
-	public void onParseFinished(BaseObject3D baseObject3D) {
+	public void onParseFinished(Object3D baseObject3D) {
 		final Message msg = new Message();
 		msg.obj = mInstance;
 
 		try {
-			String extension = ".ser";
-			switch (exportType) {
-			case AWD:
-				extension = ".awd";
-				break;
-			case SERIALIZED:
-				break;
-			default:
-				extension = ".unknown";
-			}
-
-			final String outFileName = new String(fileName + extension)
-					.substring(Environment.getExternalStorageDirectory()
-							.getAbsolutePath().length());
+			final String outFileName = fileName.substring(Environment
+					.getExternalStorageDirectory().getAbsolutePath().length());
 			final MeshExporter exporter = new MeshExporter(baseObject3D);
 			exporter.setExportDirectory(Environment
 					.getExternalStorageDirectory());
-			exporter.export(outFileName, exportType);
+			exporter.export(outFileName, exportType, true);
 
 			msg.arg1 = PARSING_SUCCSESSFUL;
 		} catch (Exception e) {
